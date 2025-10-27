@@ -15,9 +15,9 @@ Bike.Input.n_points = 200; % speed discretization points
 Bike = ModelInput(Bike);
 
 % Solver Model
-Results = SoverModel(Bike);
+Results = SolverModel(Bike);
 
 % Plot Results
-PlotResults(Results, Bike.Input)
+PlotResults(Results, Bike.Input);
 
 
