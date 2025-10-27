@@ -1,0 +1,113 @@
+% ----------------- Impostazioni iniziali -----------------
+clear; clc; close all;
+
+% ----------------- Import data -----------------
+Bike = load_PMF_V2();
+[Bike, Output, P, T] = getBike(Bike);
+Bike.data = computeData(P,Bike, Output);
+
+
+
+% ----------------- Model Inputs -----------------
+Bike.Input.v_start = 0.1; % start speed in km/h
+Bike.Input.v_finish = 200; % finish speed in km/h
+Bike.Input.n_points = 200; % speed discretization points
+
+% function to find model input vectors
+Bike = ModelInput(Bike);
+
+
+% Solver Model
+Results = SoverModel(Bike);
+
+
+
+
+
+% % ---------------- Palette Colori ----------------
+colors = lines(n_modi);
+
+
+% ---------------- Plot Frequenze Naturali ----------------
+figure('Name','Frequenze Naturali','NumberTitle','off');
+hold on;
+for j = 1:n_modi
+    plot(vx_values * 3.6, frequenze_naturali(j, :), 'LineWidth', 1.8, 'Color', colors(j, :));
+end
+xlabel('Velocità [km/h]');
+ylabel('Frequenza [Hz]');
+legend(arrayfun(@(j) sprintf('Modo %d', j), 1:n_modi, 'UniformOutput', false), 'Location', 'best');
+grid on;
+grid minor;
+
+% ---------------- Plot Root Locus ----------------
+figure('Name','Plot Root Locus','NumberTitle','off');
+hold on;
+
+% Traccia i root locus per ogni modo
+for j = 1:n_modi
+    h(j) = plot(real(poli(j,:)), imag(poli(j,:)), 'LineWidth', 1.5, 'Color', colors(j, :));
+end
+
+% Traccia una "x" solo una volta per indicare il punto iniziale (senza ripetere in legenda)
+for j = 1:n_modi
+    plot(real(poli(j,1)), imag(poli(j,1)), 'x', 'MarkerSize', 10, 'LineWidth', 2, 'Color', colors(j,:));
+end
+
+% Aggiungi etichette
+xlabel('Parte Reale');
+ylabel('Parte Immaginaria');
+
+% Crea legenda: modi + punto iniziale
+legend([h, plot(nan, nan, 'xk', 'MarkerSize', 10, 'LineWidth', 2)], ...
+       [arrayfun(@(j) sprintf('Modo %d', j), 1:n_modi, 'UniformOutput', false), {'pto. di partenza polo'}], ...
+       'Location', 'best');
+
+grid on;
+grid minor;
+
+
+% ---------------- Plot Parte Reale dei Poli vs Velocità ----------------
+figure('Name','Parte Reale dei Poli vs Velocità','NumberTitle','off');
+hold on;
+
+for j = 1:n_modi
+    plot(vx_values * 3.6, real(poli(j,:)), 'LineWidth', 1.8, 'Color', colors(j, :));
+end
+
+xlabel('Velocità [km/h]');
+ylabel('Parte Reale (\sigma)');
+title('Parte Reale dei Poli vs Velocità');
+grid on;
+grid minor;
+
+% Linea orizzontale a 0 (confine stabilità)
+yline(0, '--k', 'LineWidth', 1.2);
+
+legend(arrayfun(@(j) sprintf('Modo %d', j), 1:n_modi, 'UniformOutput', false), ...
+       'Location', 'best');
+
+
+
+
+
+
+% ----------------- Analisi Stabilità -----------------
+fprintf('\n--- Analisi stabilità dei modi ---\n');
+for j = 1:n_modi
+    parte_reale = real(poli(j, :));
+    idx_instabile = find(parte_reale > 0, 1);
+
+    if isempty(idx_instabile)
+        fprintf('Modo %d: sempre STABILE.\n', j);
+    elseif idx_instabile == 1
+        fprintf('Modo %d: sempre INSTABILE.\n', j);
+    else
+        fprintf('Modo %d: diventa INSTABILE a vx = %.2f Km/h\n', j, vx_values(idx_instabile)*3.6);
+    end
+end
+
+
+
+
+
