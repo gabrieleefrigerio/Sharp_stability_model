@@ -1,4 +1,4 @@
-function PlotMultibody(T, P, data, Output)
+function PlotMultibody(T, P, data, ax)
 % PlotMultibody - Visualizza la geometria del sistema multibody della moto.
 %
 % Author: Antonio Filianoti
@@ -12,9 +12,12 @@ function PlotMultibody(T, P, data, Output)
 %   Crea una visualizzazione 3D della moto, includendo telaio, ruote, forcelle, baricentri e assi.
 
     %% === Impostazioni iniziali della figura ===
-    f = figure('Position', [100, 100, 1600, 900]);
-    ax = axes('Parent', f); 
-    view(45,30); axis equal; grid on; camlight; hold on;
+    if nargin < 4
+        f = figure('Position', [100, 100, 1600, 900]);
+        ax = axes('Parent', f);
+        view(45,30); axis equal; grid on; camlight; hold on;
+    end
+
 
     %% === Parametri grafici ===
     giallo_ohlins   = [1.0, 0.72, 0.0];      % Colore foderi forcella (tipo Öhlins)

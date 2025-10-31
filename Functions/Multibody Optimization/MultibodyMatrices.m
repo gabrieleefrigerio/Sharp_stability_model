@@ -1,4 +1,4 @@
-function [T_out, P, data] = MultibodyMatrices(data,P) %data,P
+function [T_out, P, Bike] = MultibodyMatrices(Bike,P, State) %data,P
 % MULTIBODYMATRICES - Computes the transformation matrices and key points of a motorcycle's front and rear suspension system.
 %
 % This function calculates the spatial configuration of the motorcycle multibody system 
@@ -6,7 +6,7 @@ function [T_out, P, data] = MultibodyMatrices(data,P) %data,P
 % matrices and the 3D coordinates of important reference points.
 %
 % INPUT:
-%   data : struct
+%   Bike : struct
 %       Contains all the necessary geometric and kinematic parameters of the motorcycle, 
 %       including suspension lengths, angles, wheel sizes, and offsets.
 %
@@ -32,38 +32,59 @@ function [T_out, P, data] = MultibodyMatrices(data,P) %data,P
 % -------------------------------------------------------------------------
     %% === ESTRAZIONE PARAMETRI ===
 
-    RoadSlope           = data.Road.Slope;
-    Banking             = data.Road.Banking;
-    Roll                = data.Multibody.Roll;
-    AlphaSwingArm       = data.Multibody.AlphaSwingArm;
-    gamma               = data.Multibody.Gamma;  %% gamma regolazione dovuta a piastre
-    SteeringAngle       = data.Multibody.SteeringAngle;
-    LengthSwingArmFinal = data.Multibody.LengthSwingArmFinal;
-    BetaSDRFrame       = data.Multibody.BetaSDRFrame;         
-    LengthFrameFinal    = data.Multibody.LengthFrameFinal;
-    RearSize            = data.Wheels.RearSize;
-    RearTorus           = data.Wheels.RearTorus;
-    FrontSize           = data.Wheels.FrontSize;
-    FrontTorus          = data.Wheels.FrontTorus;
-    PlatesForkOffset    = data.FrontSuspension.PlatesForkOffset;
-    ForksWheelbase      = data.FrontSuspension.ForksWheelbase;
-    OffsetTop           = data.FrontSuspension.OffsetTop;
-    PlatesTopThickness  = data.FrontSuspension.PlatesTopThickness;
-    ForksVerticalOffset = data.FrontSuspension.ForksVerticalOffset;
-    ForksLength         = data.FrontSuspension.ForksLength;
-    ForksCompression    = data.FrontSuspension.Compression;
-    FootOffset          = data.FrontSuspension.FootOffset;
-    MassRear            = data.Swingarm.COGMass;
-    MassFront           = data.FrontSuspension.COGMass;
-    MassFrame           = data.Frame.COGMass;
-    MassRearWheel       = data.Wheels.RearMass;
-    MassFrontWheel      = data.Wheels.FrontMass;
-    COGXRear            = data.Swingarm.COGX;
-    COGZRear            = data.Swingarm.COGZ;
-    COGXFrame           = data.Frame.COGX;
-    COGZFrame           = data.Frame.COGZ;
-    COGXFront           = data.FrontSuspension.COGX;
-    COGZFront           = data.FrontSuspension.COGZ;
+   if nargin > 2
+        y_dis       = State(1);  % [m] traslazione laterale ruota posteriore
+        yaw_angle   = State(2);  % [rad]
+        roll_angle  = State(3);  % [rad]
+        steer_angle = State(4);  % [rad]
+    
+        %% === Aggiorna parametri multibody nella struttura Bike ===
+        Bike.Multibody.Roll          = roll_angle;
+        Bike.Multibody.SteeringAngle = steer_angle;
+        Bike.Multibody.Yaw           = yaw_angle;
+        Bike. Multibody.YDis         = y_dis/1000; % in mm
+    end
+
+    %% === Estrazione parametri geometrici da Bike ===
+    RoadSlope          = Bike.Road.RoadSlope;     % [rad]
+    Banking            = Bike.Road.Banking;       % [rad]
+    Yaw               = Bike.Multibody.Yaw;
+    y_dis              = Bike. Multibody.YDis;
+    roll_angle         = Bike.Multibody.Roll; 
+    steer_angle        = Bike.Multibody.SteeringAngle; 
+
+    RoadSlope           = Bike.Road.Slope;
+    Banking             = Bike.Road.Banking;
+    Roll                = Bike.Multibody.Roll;
+    AlphaSwingArm       = Bike.Multibody.AlphaSwingArm;
+    gamma               = Bike.Multibody.Gamma;  %% gamma regolazione dovuta a piastre
+    SteeringAngle       = Bike.Multibody.SteeringAngle;
+    LengthSwingArmFinal = Bike.Multibody.LengthSwingArmFinal;
+    BetaSDRFrame       = Bike.Multibody.BetaSDRFrame;         
+    LengthFrameFinal    = Bike.Multibody.LengthFrameFinal;
+    RearSize            = Bike.Wheels.RearSize;
+    RearTorus           = Bike.Wheels.RearTorus;
+    FrontSize           = Bike.Wheels.FrontSize;
+    FrontTorus          = Bike.Wheels.FrontTorus;
+    PlatesForkOffset    = Bike.FrontSuspension.PlatesForkOffset;
+    ForksWheelbase      = Bike.FrontSuspension.ForksWheelbase;
+    OffsetTop           = Bike.FrontSuspension.OffsetTop;
+    PlatesTopThickness  = Bike.FrontSuspension.PlatesTopThickness;
+    ForksVerticalOffset = Bike.FrontSuspension.ForksVerticalOffset;
+    ForksLength         = Bike.FrontSuspension.ForksLength;
+    ForksCompression    = Bike.FrontSuspension.Compression;
+    FootOffset          = Bike.FrontSuspension.FootOffset;
+    MassRear            = Bike.Swingarm.COGMass;
+    MassFront           = Bike.FrontSuspension.COGMass;
+    MassFrame           = Bike.Frame.COGMass;
+    MassRearWheel       = Bike.Wheels.RearMass;
+    MassFrontWheel      = Bike.Wheels.FrontMass;
+    COGXRear            = Bike.Swingarm.COGX;
+    COGZRear            = Bike.Swingarm.COGZ;
+    COGXFrame           = Bike.Frame.COGX;
+    COGZFrame           = Bike.Frame.COGZ;
+    COGXFront           = Bike.FrontSuspension.COGX;
+    COGZFront           = Bike.FrontSuspension.COGZ;
 
 
     %% === OPERATORI ===
@@ -77,15 +98,18 @@ function [T_out, P, data] = MultibodyMatrices(data,P) %data,P
     
     % Orientamento iniziale toroide (centrato e con rollio)
     T_roll = T_SDR_abs * T_rot(Rx(Roll));
-    T_torus_init = T_roll * T_tr(RearTorus * [0; 0; 1]);
+    T_yaw = T_rot(Rz(Yaw));
+    T_y_dis = T_tr([0; y_dis; 0]);
+    T_torus_init = T_roll * T_tr(RearTorus * [0; 0; 1]) * T_y_dis * T_yaw;
+
     
     %% === Generazione punti toroide (locali) ===
-    P_local_rear = data.Wheels.FineRearMesh;
+    P_local_rear = Bike.Wheels.FineRearMesh;
 
 
     %% === Allineamento toroide tangente al piano ===
     %bypasso se moto dritta per velocità
-    if data.Multibody.Roll == 0 && data.Multibody.SteeringAngle == 0 && data.Road.Slope == 0 && data.Road.Banking == 0
+    if Bike.Multibody.Roll == 0 && Bike.Multibody.SteeringAngle == 0 && Bike.Road.Slope == 0 && Bike.Road.Banking == 0
         % INVERSA del piano e normale globale
         T_inv_plane  = inv(T_SDR_abs);
         plane_normal = T_SDR_abs(1:3,3);
@@ -115,19 +139,19 @@ function [T_out, P, data] = MultibodyMatrices(data,P) %data,P
     end
 
     p_centro_post = T_centro_post(1:3,4);
-    p_sprocket = [p_centro_post(1); data.Frame.PinionY; p_centro_post(3)];
+    p_sprocket = [p_centro_post(1); Bike.Frame.PinionY; p_centro_post(3)];
     T_contatto_post = T_centro_post;
     T_contatto_post(1:3,4) = p_contatto_post;
     
     % --- Calcolo diametro e raggio primitivo della corona ---
-    z_sprocket = data.Transmission.FinalSprocket;   % numero denti corona
-    m_chain    = data.Transmission.FinalChainModule; % passo catena
+    z_sprocket = Bike.Transmission.FinalSprocket;   % numero denti corona
+    m_chain    = Bike.Transmission.FinalChainModule; % passo catena
     d_sprocket = m_chain * z_sprocket;
     r_sprocket = d_sprocket / 2/ pi;
     
     % --- Costruzione trasformazione della corona (origine centro ruota posteriore) ---
     % Traslazione laterale lungo Y del mozzo posteriore
-    T_sprocket = T_centro_post * T_tr(data.Frame.PinionY * [0;1 ; 0]);
+    T_sprocket = T_centro_post * T_tr(Bike.Frame.PinionY * [0;1 ; 0]);
 
     T_sup_sprocket = T_sprocket * T_tr(r_sprocket * [0;0 ; 1]);
     
@@ -136,16 +160,15 @@ function [T_out, P, data] = MultibodyMatrices(data,P) %data,P
     
     
     %% Ottimizzazione angolo beccheggio
-    P_local_front = data.Wheels.FineFrontMesh;
+    P_local_front = Bike.Wheels.FineFrontMesh;
     
-    % if Roll == 0 && SteeringAngle== 0 
-    %     mu_opt = 0;
-    % else
-    %     mu_opt = findMuForFlatFrontContact(T_centro_post, T_SDR_abs, P_local_front, data,P);
-    % end
+    if Roll == 0 && SteeringAngle== 0 
+        mu_opt = 0;
+    else
+        mu_opt = findMuForFlatFrontContact(T_centro_post, T_SDR_abs, Bike, P, P_local_front);
+    end
 
-    mu_opt = 0;
-    data.Multibody.mu = rad2deg(mu_opt);
+    Bike.Multibody.mu = rad2deg(mu_opt);
     T_centro_post = T_centro_post * T_rot(Ry(mu_opt));
 
     %% === FORCELLONE POST ===
@@ -163,13 +186,13 @@ function [T_out, P, data] = MultibodyMatrices(data,P) %data,P
 
 
     % Trasformazione 4x4 del pignone (orientamento pari al pivot)
-    v_pinion_local = [data.Frame.PinionX; data.Frame.PinionY; data.Frame.PinionZ];
+    v_pinion_local = [Bike.Frame.PinionX; Bike.Frame.PinionY; Bike.Frame.PinionZ];
     T_pinion = T_frame_pivot * T_tr(v_pinion_local);
     p_pinion = T_pinion(1:3,4);
 
     
     % --- Calcolo raggio primitivo e diametro ---
-    z_pinion = data.Transmission.FinalPinion;
+    z_pinion = Bike.Transmission.FinalPinion;
     d_pinion = m_chain * z_pinion / pi;
     r_pinion = d_pinion / 2;
     
@@ -293,7 +316,7 @@ function [T_out, P, data] = MultibodyMatrices(data,P) %data,P
     % 
 
     %% === PTO CONTATTO ANT ===
-    P_Front_Torus = drawTorus([], T_centro_ant,data.Wheels.FineFrontMesh, false);
+    P_Front_Torus = drawTorus([], T_centro_ant,Bike.Wheels.FineFrontMesh, false);
     
     % Definizione del piano nel sistema di riferimento T_SDR_abs
     p0 = T_SDR_abs(1:3, 4);       % Punto sul piano

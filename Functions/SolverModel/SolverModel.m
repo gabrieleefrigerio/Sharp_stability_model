@@ -1,4 +1,4 @@
-function [Results] = SoverModel(Bike)
+function [Results] = SolverModel(Bike)
 % ----------------- Primo calcolo per identificare n_modi -----------------
 Results = struct();
 Results.A = Sharp_Model(Bike,1);
@@ -11,9 +11,9 @@ Results.frequenze_naturali = zeros(Results.n_modi, Bike.Input.n_points);
 Results.smorzamenti = zeros(Results.n_modi, Bike.Input.n_points);
 Results.stabilita = strings(Results.n_modi, Bike.Input.n_points);
 
-Results.Capsize = zeros(1, Bike.Input.n_points);
-Results.Weave   = zeros(1, Bike.Input.n_points);
-Results.Wobble  = zeros(1, Bike.Input.n_points);
+% Results.Capsize = zeros(1, Bike.Input.n_points);
+% Results.Weave   = zeros(1, Bike.Input.n_points);
+% Results.Wobble  = zeros(1, Bike.Input.n_points);
 
 Results.A = zeros(Results.n_modi, Results.n_modi, Bike.Input.n_points);
 

@@ -230,5 +230,10 @@ function [A] = Sharp_Model(Bike, ii)
     
     A = [O,     I;
          A21, A22];
+
+    B1 = zeros(6,1);
+    B2 = - inv(M) * G;
+
+    B = [B1 ; B2 ];
 end
 
