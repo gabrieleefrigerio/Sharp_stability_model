@@ -38,7 +38,7 @@ freq_filt = flip(Results.freq_filt{25});
 speed_kmh = 50;
 
 % 1️⃣ Per esportare GIF animate
-ExportBikeModeGIF(Bike, P, ModeShapes, freq_filt, speed_kmh, 'Modo');
+ ExportBikeModeGIF(Bike, P, ModeShapes, freq_filt, speed_kmh, 'Modo');
 
 % 2️⃣ Per plottare i modi statici (tutti insieme)
 PlotBikeModeStatic(Bike, P, ModeShapes, freq_filt, speed_kmh);
@@ -59,14 +59,14 @@ function PlotBikeModeStatic(Bike, P, ModeShapes, freqsHz, speed_kmh)
 % =========================================================================
 
     nModes = size(ModeShapes, 2);
-    Scale  = 1000;
+    Scale  = 2500;
 
     % Stato base [y_dis; yaw; roll; steer]
     State0 = [10; deg2rad(20); deg2rad(90); deg2rad(25)];
 
     % Crea una sola figura visibile
     f = figure('Visible','on','Position',[100,100,1600,900]);
-    t = tiledlayout(f, ceil(nModes/3), 3, 'TileSpacing','compact','Padding','compact');
+    t = tiledlayout(f, 2, 2, 'TileSpacing','compact','Padding','compact');
 
     for imode = 1:nModes
         ModeShape = ModeShapes(:, imode);
@@ -126,7 +126,8 @@ function ExportBikeModeGIF(Bike, P, ModeShapes, freqsHz, speed_kmh, baseName)
 %   baseName    -> prefisso per i file GIF (es. 'Modo')
 %
 % NOTE:
-%   L'animazione va da [0 0 0 0] → +State0 → -State0 → [0 0 0 0]
+%   L'animazione normale: 0 → +State0 → -State0 → 0
+%   Per modi con freq < 0.5 Hz: 0 → +State0
 % =========================================================================
 
     if nargin < 6
@@ -141,30 +142,22 @@ function ExportBikeModeGIF(Bike, P, ModeShapes, freqsHz, speed_kmh, baseName)
     end
 
     nModes = size(ModeShapes, 2);
-
-    % Parametri animazione
-    N = 2; % passi per tratto
-    factorVec = [linspace(0, 1, N), linspace(1, -1, 2*N), linspace(-1, 0, N)];
     Scale = 1000;       % amplificazione visuale
-    delay = 0.1;         % tempo tra frame (s)
-
-    % Stato base [y_dis; yaw; roll; steer]
+    delay = 0.1;        % tempo tra frame (s)
     State0 = [10; deg2rad(20); deg2rad(90); deg2rad(25)];
 
-    % Figura invisibile per velocità
+    % Figura invisibile
     f = figure('Visible','off','Position',[100,100,1600,900]);
     ax = axes('Parent', f);
     view(45,30); axis equal; grid on; camlight; hold on;
 
-    % Loop sui modi
     for imode = 1:nModes
         ModeShape = ModeShapes(:, imode);
         ModeShape = abs(ModeShape)/norm(ModeShape);
-
         Ampl_factor = [ModeShape(1); ModeShape(2); ModeShape(5); ModeShape(6)];
         StateMax = State0 .* Ampl_factor * Scale;
 
-        % 🔹 Percorso completo della GIF
+        % 🔹 Percorso GIF
         gifName = sprintf('%s_%02d.gif', baseName, imode);
         gifPath = fullfile(outputFolder, gifName);
 
@@ -182,7 +175,18 @@ function ExportBikeModeGIF(Bike, P, ModeShapes, freqsHz, speed_kmh, baseName)
 
         fprintf('▶ Genero %s ... ', gifPath);
 
-        % 🔸 Ciclo di animazione
+        % 🔸 Determina il vettore dei frame
+        if freqsHz(imode) < 0.5
+            % Modi molto lenti: solo 0 → +State0
+            N = 10;
+            factorVec = linspace(0, 1, N)*10;
+        else
+            % Animazione normale: 0 → +State0 → -State0 → 0
+            N = 2;
+            factorVec = [linspace(0, 1, N), linspace(1, -1, 2*N), linspace(-1, 0, N)];
+        end
+
+        % 🔸 Ciclo animazione
         for i = 1:length(factorVec)
             State = StateMax * factorVec(i);
             [T, P_upd, Bike_upd] = MultibodyMatrices(Bike, P, State);
@@ -190,14 +194,12 @@ function ExportBikeModeGIF(Bike, P, ModeShapes, freqsHz, speed_kmh, baseName)
             cla(ax); camlight;
             PlotMultibody(T, P_upd, Bike_upd, ax);
             title(sprintf('Modo %d — f = %s Hz — V = %s km/h', ...
-                imode, freqStr, velStr), ...
-                'FontWeight','bold','FontSize',14);
+                imode, freqStr, velStr), 'FontWeight','bold','FontSize',14);
 
             % Frame → GIF
             frame = getframe(f);
             im = frame2im(frame);
             [A, map] = rgb2ind(im, 256);
-
             if i == 1
                 imwrite(A, map, gifPath, 'gif', 'LoopCount', Inf, 'DelayTime', delay);
             else
@@ -209,5 +211,7 @@ function ExportBikeModeGIF(Bike, P, ModeShapes, freqsHz, speed_kmh, baseName)
     end
 
     close(f);
-    disp('🎬 Tutte le GIF generate in background con successo!');
+    disp('🎬 Tutte le GIF generate con successo!');
 end
+
+
