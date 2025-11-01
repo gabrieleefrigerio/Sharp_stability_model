@@ -29,7 +29,7 @@ function [Mesh_out] = drawTorus(ax,T, Mesh_in,filled)
     % Se richiesto, disegno la superficie
     if filled
         % Recupero dimensioni originali
-        tic
+        
         nPoints = size(Mesh_in, 2);
         N = sqrt(nPoints);   % supponendo griglia NxN
 
@@ -37,7 +37,7 @@ function [Mesh_out] = drawTorus(ax,T, Mesh_in,filled)
         X = reshape(Mesh_in(1,:), [N, N]);
         Y = reshape(Mesh_in(2,:), [N, N]);
         Z = reshape(Mesh_in(3,:), [N, N]);
-        toc
+        
         Xw = reshape(Mesh_out(1,:), size(X));
         Yw = reshape(Mesh_out(2,:), size(Y));
         Zw = reshape(Mesh_out(3,:), size(Z));

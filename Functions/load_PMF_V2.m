@@ -159,7 +159,7 @@ function data = load_PMF_V2()
     data.Wheels.FrontMass = load(102);
     data.Wheels.RearSize = load(103);    
     data.Wheels.RearMass = load(104);
-
+    
     data.Wheels.RearTorus = 50;
     data.Wheels.FrontTorus = 40;
 
@@ -169,16 +169,7 @@ function data = load_PMF_V2()
     [data.Wheels.FineRearMesh] = drawTorusMesh(1000, data.Wheels.RearSize, data.Wheels.RearTorus);
     [data.Wheels.CoarseRearMesh] = drawTorusMesh(50, data.Wheels.RearSize, data.Wheels.RearTorus);
 
-    
-    %% DA METTERE FUNZIONE PER IMPOSTARLI
-    data.Wheels.RearTorus = 50;
-    data.Wheels.FrontTorus = 40;
-    
-    % creo la mesh delle gomme
-    [data.Wheels.FineFrontMesh] = drawTorusMesh(1000, data.Wheels.FrontSize, data.Wheels.FrontTorus);
-    [data.Wheels.CoarseFrontMesh] = drawTorusMesh(50, data.Wheels.FrontSize, data.Wheels.FrontTorus);
-    [data.Wheels.FineRearMesh] = drawTorusMesh(1000, data.Wheels.RearSize, data.Wheels.RearTorus);
-    [data.Wheels.CoarseRearMesh] = drawTorusMesh(50, data.Wheels.RearSize, data.Wheels.RearTorus);
+  
 
     %% TRANSMISSION
 

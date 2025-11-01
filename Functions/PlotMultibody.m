@@ -32,26 +32,26 @@ function PlotMultibody(T, P, data, ax)
 
     %% === Disegno dei frame ===
     % Frame principali
-    drawFrame(T.T_SDR_abs,         'SDR Abs', L_axis_main);
-    drawFrame(T.T_contatto_post,   'Rear Wheel Contact', L_axis_main);
-    drawFrame(T.T_centro_post,     'Rear Wheel Center', L_axis_main);
-    drawFrame(T.T_swing_pivot,     'Swingarm Pivot', L_axis_main);
-    drawFrame(T.T_steering_axis,   'Steering Axis', L_axis_main);
-    drawFrame(T.T_contatto_ant,    'Front Wheel Contact', L_axis_main);
-    drawFrame(T.T_frame_pivot,     'Frame Pivot', L_axis_main);
+    % drawFrame(T.T_SDR_abs,         'SDR Abs', L_axis_main);
+    % drawFrame(T.T_contatto_post,   'Rear Wheel Contact', L_axis_main);
+    % drawFrame(T.T_centro_post,     'Rear Wheel Center', L_axis_main);
+    % drawFrame(T.T_swing_pivot,     'Swingarm Pivot', L_axis_main);
+    % drawFrame(T.T_steering_axis,   'Steering Axis', L_axis_main);
+    % drawFrame(T.T_contatto_ant,    'Front Wheel Contact', L_axis_main);
+    % drawFrame(T.T_frame_pivot,     'Frame Pivot', L_axis_main);
     % drawFrame(T.T_pinion,     'Pinion', L_axis_main);
     % drawFrame(T.T_sprocket,     'Sprocket', L_axis_main);
 
     % Frame secondari (senza etichetta)
-    drawFrame(T.T_sup_forc_dx,     '', L_axis);
-    drawFrame(T.T_sup_forc_sx,     '', L_axis);
-    drawFrame(T.T_mid_forc_dx,     '', L_axis);
-    drawFrame(T.T_mid_forc_sx,     '', L_axis);
-    drawFrame(T.T_end_forc_dx,     '', L_axis);
-    drawFrame(T.T_end_forc_sx,     '', L_axis);
-    drawFrame(T.T_foot_dx,         '', L_axis);
-    drawFrame(T.T_foot_sx,         '', L_axis);
-    drawFrame(T.T_centro_ant,      'Front Wheel Center', L_axis);
+    % drawFrame(T.T_sup_forc_dx,     '', L_axis);
+    % drawFrame(T.T_sup_forc_sx,     '', L_axis);
+    % drawFrame(T.T_mid_forc_dx,     '', L_axis);
+    % drawFrame(T.T_mid_forc_sx,     '', L_axis);
+    % drawFrame(T.T_end_forc_dx,     '', L_axis);
+    % drawFrame(T.T_end_forc_sx,     '', L_axis);
+    % drawFrame(T.T_foot_dx,         '', L_axis);
+    % drawFrame(T.T_foot_sx,         '', L_axis);
+    % drawFrame(T.T_centro_ant,      'Front Wheel Center', L_axis);
 
     %% === Disegno delle ruote ===
     drawTorus(ax, T.T_centro_post, data.Wheels.CoarseRearMesh, true);   % Ruota posteriore
